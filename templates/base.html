@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}RecetaMatch{% endblock %}</title>
+
+    <!-- Estilos para las estrellas -->
+    <style>
+      .rating .star { color: #d1d5db; transition: color .15s ease; }        /* gris */
+      .rating input:checked + .star,
+      .rating input:checked + .star ~ .star { color: #f59e0b; }             /* amber */
+      .rating .star:hover,
+      .rating .star:hover ~ .star { color: #f59e0b; }
+      .rating input { display: none; }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-gradient-to-br from-teal-50 via-emerald-50 to-teal-100 text-gray-800">
+
+    {% include "_navbar.html" %}
+
+    <main class="px-8 py-8 max-w-6xl mx-auto">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-center text-xs text-gray-500 py-4 mt-6 border-t border-teal-100">
+      © 2025 RecetaMatch — Hecho con ❤️
+    </footer>
+
+  </body>
+</html>

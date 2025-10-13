@@ -1,0 +1,101 @@
+
+{% extends "base.html" %}
+{% from "_macros.html" import rating_stars %}
+
+{% block title %}Recomendaciones para {{name}}{% endblock %}
+
+{% block content %}
+    <!-- CONTENIDO -->
+    <main class="px-8 py-8 max-w-6xl mx-auto">
+      <!-- Título receta -->
+      <h2 class="text-xl font-semibold text-teal-800 mb-6">
+        {{ recipe.title }}
+        <span class="text-sm text-gray-500 block mt-1">
+          {{ recipe.category }}{% if recipe.total_time %} – {{ recipe.total_time }} min{% endif %}
+        </span>
+      </h2>
+
+      <!-- FORM: guarda ratings al enviar -->
+      <form method="post" action="/recomendaciones" class="space-y-10">
+        <!-- Tarjeta principal -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col md:flex-row">
+          <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="w-full md:w-1/2 h-80 object-cover" />
+
+          <div class="p-6 flex flex-col flex-grow">
+            <span class="font-medium">{{ recipe.category }}</span>
+            <p class="text-sm text-gray-600 mb-2">
+              Por
+              {% if recipe.author_id %}
+                <a href="/autor/{{recipe.author_id}}" class="text-teal-600 hover:underline">{{ recipe.author_name }}</a>
+              {% else %}
+                {{ recipe.author_name }}
+              {% endif %}
+            </p>
+
+            {% if recipe.description %}
+              <p class="text-gray-700 mb-4 leading-relaxed">{{ recipe.description }}</p>
+            {% endif %}
+            {% if recipe.rating %}
+              <p class="text-gray-700 mb-2 leading-relaxed">⭐ {{ recipe.rating|round(1) }} ({{ recipe.num_ratings }} valoraciones)</p>
+            {% endif %}
+
+            {% if recipe.url %}
+              <a href="{{ recipe.url }}" target="_blank" class="text-sm text-teal-600 hover:underline mb-4">
+                Ver receta completa en Food.com →
+              </a>
+            {% endif %}
+
+            <!-- Rating principal -->
+            {{ rating_stars(recipe.recipe_id, recipe.user_rating) }}
+          </div>
+        </div>
+
+        <!-- Recomendaciones relacionadas -->
+        <section>
+          <h3 class="text-lg font-bold text-teal-700 mb-4">
+            Quienes vieron <span class="italic">{{ recipe.title }}</span> también vieron...
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for rec in recipes_recomendados %}
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden border border-gray-100 flex flex-col">
+              <a href="/recomendaciones/{{rec.recipe_id}}">
+                <img src="{{ rec.image_url }}" class="w-full h-40 object-cover" alt="Imagen de {{rec.title}}" />
+              </a>
+
+              <div class="p-4 flex flex-col flex-grow">
+                <h4 class="font-semibold text-teal-700 hover:underline mb-1">
+                  <a href="/recomendaciones/{{rec.recipe_id}}">{{ rec.title }}</a>
+                </h4>
+                <p class="text-sm text-gray-600 mb-2">
+                  {{ rec.category }}{% if rec.total_time %} – ⏱️ {{ rec.total_time }} min{% endif %}
+                </p>
+                {% if recipe.rating %}
+                  <p class="text-sm text-gray-600 mb-2">⭐ {{ recipe.rating|round(1) }} ({{ recipe.num_ratings }} valoraciones)</p>
+                {% endif %}
+                {% if rec.author_name %}
+                  <p class="text-sm text-gray-500 mb-2">Por {{ rec.author_name }}</p>
+                {% endif %}
+                {% if rec.description %}
+                  <p class="text-sm text-gray-500 mb-4">{{ rec.description|truncate(120) }}</p>
+                {% endif %}
+
+                <!-- Rating en tarjetas relacionadas -->
+                {{ rating_stars(rec.recipe_id, rec.user_rating) }}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+
+        <!-- Botón enviar -->
+        <div class="flex justify-end mt-8">
+          <input
+            type="submit"
+            class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition"
+            value="Actualizar opiniones"
+          />
+        </div>
+      </form>
+    </main>
+{% endblock %}

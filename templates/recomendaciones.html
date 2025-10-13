@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rating_stars %}
+
+{% block title %}Recomendaciones para {{name}}{% endblock %}
+
+{% block content %}
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="px-8 py-6">
+      <h2 class="text-xl font-semibold text-teal-800 mb-6">
+        Tus Recomendaciones...
+      </h2>
+
+      <form method="post" action="/recomendaciones">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for recipe in recipes_recomendados %}
+          <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden border border-gray-100 flex flex-col">
+            
+            <!-- Imagen -->
+            <a href="/recomendaciones/{{recipe.recipe_id}}">
+              <img src="{{recipe.image_url}}" class="w-full h-48 object-cover" alt="Imagen de {{recipe.title}}" />
+            </a>
+
+            <!-- Contenido -->
+            <div class="p-4 flex flex-col flex-grow">
+              <h3 class="font-semibold text-lg text-teal-700 hover:underline mb-1">
+                <a href="/recomendaciones/{{recipe.recipe_id}}">{{ recipe.title }}</a>
+              </h3>
+
+              <div class="text-sm text-gray-600 mb-2 flex flex-wrap gap-x-3">
+                <span class="font-medium">{{ recipe.category }}</span>
+                {% if recipe.rating %}
+                <span>⭐ {{ recipe.rating|round(1) }} ({{ recipe.num_ratings }} valoraciones)</span>
+                {% endif %}
+                {% if recipe.total_time %}
+                <span>⏱️ {{ recipe.total_time }} min</span>
+                {% endif %}
+              </div>
+
+              {% if recipe.author_name %}
+              <p class="text-sm text-gray-500 mb-3">
+                Por <a href="/autor/{{recipe.author_id}}" class="text-teal-600 hover:underline">{{ recipe.author_name }}</a>
+              </p>
+              {% endif %}
+
+              {% if recipe.description %}
+              <p class="text-sm text-gray-500 mb-4">{{ recipe.description|truncate(150) }}</p>
+              {% endif %}
+
+			  <!-- Rating principal -->
+            {{ rating_stars(recipe.recipe_id, recipe.user_rating) }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="flex justify-end mt-8">
+          <input type="submit"
+            class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition"
+            value="Más recomendaciones" />
+        </div>
+      </form>
+    </main>
+{% endblock %}

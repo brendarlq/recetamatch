@@ -1,0 +1,15 @@
+# Archivos y bases locales
+*.db
+*.sqlite
+__pycache__/
+.env
+*.pyc
+
+# Archivos temporales
+.DS_Store
+*.log
+*.bak
+
+# Entornos virtuales
+venv/
+.env/

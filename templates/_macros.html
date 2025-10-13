@@ -1,0 +1,35 @@
+{% macro rating_stars(recipe_id, user_rating=0, label_text="¿Qué te pareció esta receta?", size="6") %}
+<div class="mt-auto pt-2">
+  <label class="text-md font-medium text-gray-700 block mb-1">
+    {{ label_text }}
+  </label>
+
+  <div class="flex flex-row-reverse justify-end">
+    {% for i in range(1,6) %}
+      {% set val = 6 - i %}
+      <input
+        type="radio"
+        id="{{ recipe_id }}-{{ val }}"
+        name="{{ recipe_id }}"
+        value="{{ val }}"
+        class="hidden peer peer/{{ val }}"
+        {% if user_rating == val %}checked{% endif %}
+      />
+      <label
+        for="{{ recipe_id }}-{{ val }}"
+        class="cursor-pointer text-gray-300 hover:text-amber-400 peer-checked:text-amber-400 transition"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg"
+             fill="currentColor"
+             viewBox="0 0 24 24"
+             class="w-{{ size }} h-{{ size }}">
+          <path
+            d="M12 .587l3.668 7.431L24 9.75l-6 5.847L19.335 24 
+               12 19.897 4.665 24 6 15.597 0 9.75l8.332-1.732z"
+          />
+        </svg>
+      </label>
+    {% endfor %}
+  </div>
+</div>
+{% endmacro %}
