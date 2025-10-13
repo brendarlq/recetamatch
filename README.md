@@ -44,16 +44,22 @@ El proyecto combina un backend ligero en Flask con una interfaz moderna basada e
    cd recetamatch
 
 2. Crear el entorno con Conda:
+    ```bash
     conda create -n recetamatch python=3.10
     conda activate recetamatch
 3. Instalar dependencias:
+    ```bash
     pip install -r requirements.txt
 4. Ejecutar la aplicación:
+   ```bash
     python app.py
 5. Abrir en el navegador:
+    ```bash
     http://localhost:5000
 
 ## Estructura del proyecto
+
+```bash
 sr/
 ├── app.py
 ├── recomendar.py
@@ -71,7 +77,9 @@ sr/
 └── README.md
 
 
-## Créditos
+## Creditos
+
+```bash
 Autora: Brenda Quiñónez
 Dataset: Food.com Recipes and Interactions Dataset (Kaggle)
 Despliegue: PythonAnywhere
