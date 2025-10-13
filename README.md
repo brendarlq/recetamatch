@@ -40,7 +40,7 @@ El proyecto combina un backend ligero en Flask con una interfaz moderna basada e
 
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/<tu_usuario>/recetamatch.git
+   git clone https://github.com/brendarlq/recetamatch.git
    cd recetamatch
 
 2. Crear el entorno con Conda:
@@ -63,23 +63,21 @@ El proyecto combina un backend ligero en Flask con una interfaz moderna basada e
 sr/
 ├── app.py
 ├── recomendar.py
-├── utils.py                 # Funciones auxiliares (si existen)
 ├── templates/
 │   ├── login.html
 │   ├── recomendaciones.html
 │   ├── detalle.html
 │   ├── _navbar.html
 │   └── macros.html
-├── static/
-│   └── styles.css
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+```
 
-
-## Creditos
+## Estructura del proyecto
 
 ```bash
 Autora: Brenda Quiñónez
 Dataset: Food.com Recipes and Interactions Dataset (Kaggle)
 Despliegue: PythonAnywhere
+```
