@@ -1,50 +1,80 @@
-<nav class="flex flex-wrap items-center justify-between px-8 py-4 bg-white/90 backdrop-blur-sm shadow-md border-b border-teal-100 relative">
-  <!-- Branding -->
-  <div class="flex items-center space-x-2 mb-2 md:mb-0">
-    <span class="bg-teal-600/90 text-white p-2 rounded-full shadow-md backdrop-blur-sm text-4xl">🍴</span>
-    <h1 class="text-2xl font-extrabold text-teal-700">RecetaMatch</h1>
+<nav class="px-8 py-4 bg-white/90 backdrop-blur-sm shadow-md border-b border-teal-100">
+  <div class="flex flex-wrap items-center justify-between">
+    <!-- Branding -->
+    <div class="flex items-center space-x-3 transform scale-[1.08]">
+      <span class="bg-teal-600/95 text-white p-2.5 rounded-full shadow-md text-3xl">🍴</span>
+      <h1 class="text-3xl font-black tracking-tight text-teal-700">
+        RecetaMatch
+      </h1>
+    </div>
+
+
+    <!-- Buscador -->
+    <div class="relative flex-grow max-w-md mx-4 order-3 md:order-none">
+      <input
+        type="text"
+        id="search"
+        name="search"
+        placeholder="Buscar recetas..."
+        autocomplete="off"
+        class="w-full border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm"
+      />
+      <ul id="suggestions" class="absolute z-10 bg-white border border-gray-200 rounded-lg mt-1 w-full hidden shadow-md max-h-64 overflow-y-auto"></ul>
+    </div>
+
+    <!-- Usuario + contadores + acciones -->
+    <div class="flex items-center gap-3 text-sm">
+      {% if name %}
+      <span class="hidden md:inline text-gray-600">
+        Hola, <strong>{{ name }}</strong>
+      </span>
+      <span class="inline-flex items-center gap-1 bg-white border border-teal-200 text-teal-700 px-2 py-1 rounded-full">
+        👀 {{ cant_vistos or 0 }}
+      </span>
+      <span class="inline-flex items-center gap-1 bg-white border border-amber-200 text-amber-600 px-2 py-1 rounded-full">
+        ⭐ {{ cant_valorados or 0 }}
+      </span>
+      {% endif %}
+
+      <a href="/reset"
+        class="bg-white border border-teal-400 text-teal-600 hover:bg-teal-50 font-semibold text-xs px-3 py-1.5 rounded transition">
+        Reset
+      </a>
+
+      <a href="/logout"
+        class="flex items-center gap-1 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
+        </svg>
+        Salir
+      </a>
+    </div>
   </div>
+  <div class="flex items-center justify-end gap-8 mt-1 px-1 text-xs text-gray-500">
 
-  <!-- Buscador -->
-  <div class="relative flex-grow max-w-md mx-4 order-3 md:order-none">
-    <input
-      type="text"
-      id="search"
-      name="search"
-      placeholder="Buscar recetas..."
-      autocomplete="off"
-      class="w-full border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm"
-    />
-    <ul id="suggestions" class="absolute z-10 bg-white border border-gray-200 rounded-lg mt-1 w-full hidden shadow-md max-h-64 overflow-y-auto"></ul>
-  </div>
-
-  <!-- Usuario + contadores + acciones -->
-  <div class="flex items-center gap-3 text-sm">
-    {% if name %}
-    <span class="hidden md:inline text-gray-600">
-      Hola, <strong>{{ name }}</strong>
+    <!-- Fecha -->
+    <span>
+      Última actualización: <strong>{{ LAST_UPDATE }}</strong>
     </span>
-    <span class="inline-flex items-center gap-1 bg-white border border-teal-200 text-teal-700 px-2 py-1 rounded-full">
-      👀 {{ cant_vistos or 0 }}
-    </span>
-    <span class="inline-flex items-center gap-1 bg-white border border-amber-200 text-amber-600 px-2 py-1 rounded-full">
-      ⭐ {{ cant_valorados or 0 }}
-    </span>
-    {% endif %}
 
-    <a href="/reset"
-      class="bg-white border border-teal-400 text-teal-600 hover:bg-teal-50 font-semibold text-xs px-3 py-1.5 rounded transition">
-      Reset
-    </a>
+    <!-- Selector de algoritmo -->
+    <div class="flex items-center gap-2">
+      <label for="algoritmo" class="text-gray-600">Algoritmo:</label>
 
-    <a href="/logout"
-      class="flex items-center gap-1 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
-      </svg>
-      Salir
-    </a>
+      <form method="get" action="/set_algoritmo">
+        <select id="algoritmo" name="alg" onchange="this.form.submit()"
+          class="border border-gray-300 text-gray-700 bg-white hover:border-teal-400 transition rounded px-2 py-1 cursor-pointer shadow-sm">
+          
+          {% for key, label in ALGORITHMS.items() %}
+            <option value="{{ key }}"
+              {% if request.cookies.get('algoritmo','azar') == key %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
   </div>
 </nav>
 

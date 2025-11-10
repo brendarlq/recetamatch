@@ -1,10 +1,13 @@
 ## version: 1.0 -- recomendaciones al azar
 
+from flask import request
+from math import log
 import sqlite3
 import os
 import random
 
 import metricas
+
 
 #DATABASE_FILE = os.path.dirname(os.path.abspath("__file__")) + "/datos/qll.db"
 DATABASE_FILE = os.path.dirname(__file__) + "/datos/foodcom.db"
@@ -93,27 +96,75 @@ def buscar_recetas(query):
 
 ###
 
-def recomendar_azar(id_usuario, recipes_relevantes, recipes_desconocidos, N=9):
+def recomendador_azar(id_usuario, recipes_relevantes, recipes_desconocidos, N=16):
     id_recipes = random.sample(recipes_desconocidos, N)
     return id_recipes
 
-def recomendar(id_usuario, recipes_relevantes=None, recipes_desconocidos=None, N=9):
-    if not recipes_relevantes:
-        recipes_relevantes = items_valorados(id_usuario)
+def recomendador_top_n(id_usuario, recipes_relevantes, recipes_desconocidos, N):
+    res = sql_select(f"""
+        SELECT recipe_id
+        FROM recipes
+        WHERE recipe_id IN ({",".join("?"*len(recipes_desconocidos))})
+        ORDER BY (rating * log(num_ratings + 1)) DESC
+        LIMIT ?
+    """, recipes_desconocidos + [N])
+    return [r["recipe_id"] for r in res]
 
-    if not recipes_desconocidos:
-        recipes_desconocidos = items_desconocidos(id_usuario)
+def recomendador_pares(id_usuario, recipes_relevantes, recipes_desconocidos, N):
+    if len(recipes_relevantes) == 0:
+        return recomendador_top_n(id_usuario, recipes_relevantes, recipes_desconocidos, N)
 
-    return recomendar_azar(id_usuario, recipes_relevantes, recipes_desconocidos, N)
+    res = sql_select(f"""
+        SELECT recipe_id
+        FROM reviews AS r1
+        JOIN reviews AS r2 ON r1.author = r2.author
+        WHERE r1.recipe_id IN ({",".join("?"*len(recipes_relevantes))})
+          AND r2.recipe_id IN ({",".join("?"*len(recipes_desconocidos))})
+          AND r1.recipe_id != r2.recipe_id
+          AND r1.rating > 3
+          AND r2.rating > 3
+        GROUP BY recipe_id
+        ORDER BY count(*) DESC
+        LIMIT ?
+    """, recipes_relevantes + recipes_desconocidos + [N])
 
-def recomendar_contexto(id_usuario, id_recipe, recipes_relevantes=None, recipes_desconocidos=None, N=3):
-    if not recipes_relevantes:
-        recipes_relevantes = items_valorados(id_usuario)
+    return [r["recipe_id"] for r in res]
 
-    if not recipes_desconocidos:
-        recipes_desconocidos = items_desconocidos(id_usuario)
+### Router basado en cookie ###
+def recomendar(id_usuario, relevantes=None, desconocidos=None, N=16):
+    relevantes = relevantes or items_valorados(id_usuario)
+    desconocidos = desconocidos or items_desconocidos(id_usuario)
 
-    return recomendar_azar(id_usuario, recipes_relevantes, recipes_desconocidos, N)
+    algoritmo = request.cookies.get("algoritmo", "azar")
+
+    if algoritmo == "top_n":
+        return recomendador_top_n(id_usuario, relevantes, desconocidos, N)
+    elif algoritmo == "pares":
+        return recomendador_pares(id_usuario, relevantes, desconocidos, N)
+    else:
+        return recomendador_azar(id_usuario, relevantes, desconocidos, N)
+
+def recomendador_contexto(id_usuario, id_recipe, recipes_relevantes=None, recipes_desconocidos=None, N=4):
+    recipes_relevantes = recipes_relevantes or items_valorados(id_usuario)
+    recipes_desconocidos = recipes_desconocidos or items_desconocidos(id_usuario)
+
+    algoritmo = request.cookies.get("algoritmo", "azar")
+
+    funcs = {
+        "azar": recomendador_azar,
+        "top_n": recomendador_top_n,
+        "pares": recomendador_pares,
+    }
+
+    func = funcs.get(algoritmo, recomendador_azar)
+
+    return func(id_usuario, recipes_relevantes, recipes_desconocidos, N)
+
+ALGORITHM_FUNCTIONS = {
+    "azar": recomendador_azar,
+    "top_n": recomendador_top_n,
+    "pares": recomendador_pares, 
+}
 
 ###
 
